@@ -3,11 +3,11 @@ package main
 import "time"
 
 type Note struct {
-	Id      int       `json: "id"`
-	Title   string    `json: "title"`
-	Text    string    `json: "text"`
-	Added   time.Time `json: "added"`
-	Updated time.Time `json: "updated"`
+	Id      int       `json:"id"`
+	Title   string    `json:"title"`
+	Text    string    `json:"text"`
+	Added   time.Time `json:"added"`
+	Updated time.Time `json:"updated"`
 }
 
 var lastId int = 0
