@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 )
@@ -18,6 +19,18 @@ func ListNotes(w http.ResponseWriter, r *http.Request) {
 
 func ShowNote(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
+
 	noteId := vars["noteId"]
-	fmt.Fprintf(w, "Some note %s", noteId)
+
+	found := false
+	for _, note := range notes {
+		if strconv.Itoa(note.Id) == noteId {
+			json.NewEncoder(w).Encode(note)
+			found = true
+		}
+	}
+
+	if !found {
+		w.WriteHeader(404)
+	}
 }
