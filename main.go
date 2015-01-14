@@ -1,33 +1,42 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/mux"
 )
 
+type Note struct {
+	Id      int       `json: "id"`
+	Title   string    `json: "title"`
+	Text    string    `json: "text"`
+	Added   time.Time `json: "added"`
+	Updated time.Time `json: "updated"`
+}
+
+var lastId int = 0
+
+func CreateNote(title, text string) Note {
+	// OMG an anonymous function to increment id after we return a new note
+	defer func() { lastId++ }()
+
+	return Note{Title: title, Text: text, Added: time.Now(), Updated: time.Now(), Id: lastId}
+}
+
+// Create some notes
+var notes []Note = []Note{
+	CreateNote("Things to buy", "Eggs, ham, cheese, beer"),
+	CreateNote("Important URL", "http://www.esdrasbeleza.com"),
+}
+
 func main() {
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/", Index)
-	router.HandleFunc("/notes", ListNotes)
+	router.HandleFunc("/note", ListNotes)
 	router.HandleFunc("/note/{noteId}", ShowNote)
 
 	log.Println("Starting server!")
 	log.Fatal(http.ListenAndServe(":8000", router))
-}
-
-func Index(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Hello! :D")
-}
-
-func ListNotes(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "List notes!")
-}
-
-func ShowNote(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	noteId := vars["noteId"]
-	fmt.Fprintf(w, "Some note %s", noteId)
 }
