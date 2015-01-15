@@ -16,38 +16,24 @@ var (
 func main() {
 	defer session.Close()
 
-	// FIXME: routes are NOT in the right REST format
-	router := mux.NewRouter().StrictSlash(true)
-	router.HandleFunc("/", Index)
-	router.HandleFunc("/note", ListNotes)
-	router.HandleFunc("/note/id/{noteId}", ShowNote)
-	router.HandleFunc("/note/create", AddNote).Methods("POST")
-
-	CreateSession()
-	InsertNotesIntoDatabase()
+	router := setupRouter()
+	setupDatabase()
 
 	log.Println("Starting server!")
 	log.Fatal(http.ListenAndServe(":8000", router))
 }
 
-func CreateSession() {
-	session = CreateDatabaseSession()
+func setupRouter() *mux.Router {
+	// FIXME: routes are NOT in the right REST format
+	router := mux.NewRouter().StrictSlash(true)
+	router.HandleFunc("/note", ListNotes)
+	router.HandleFunc("/note/id/{noteId}", GetNote)
+	router.HandleFunc("/note/create", RegisterNote).Methods("POST")
+	return router
 }
 
-func InsertNotesIntoDatabase() {
+func setupDatabase() {
+	session = createDatabaseSession()
 	collection = session.DB("notes").C("notes")
-	collection.RemoveAll(nil)
-
-	notes := []Note{
-		CreateNote("Things to buy", "Eggs, ham, cheese, beer"),
-		CreateNote("Important URL", "http://www.esdrasbeleza.com"),
-	}
-
-	for _, note := range notes {
-		log.Printf("Inserting note %s\n", note.Id)
-		err := collection.Insert(note)
-		if err != nil {
-			log.Println(err)
-		}
-	}
+	resetDatabase()
 }

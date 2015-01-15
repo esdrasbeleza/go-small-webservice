@@ -15,6 +15,10 @@ type Note struct {
 
 var lastId int = 0
 
-func CreateNote(title, text string) Note {
+func NewEmptyNote() Note {
+	return Note{Added: time.Now(), Updated: time.Now(), Id: bson.NewObjectId()}
+}
+
+func NewNote(title, text string) Note {
 	return Note{Title: title, Text: text, Added: time.Now(), Updated: time.Now(), Id: bson.NewObjectId()}
 }
