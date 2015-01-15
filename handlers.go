@@ -3,10 +3,12 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"gopkg.in/mgo.v2/bson"
 )
 
 func Index(w http.ResponseWriter, r *http.Request) {
@@ -14,23 +16,23 @@ func Index(w http.ResponseWriter, r *http.Request) {
 }
 
 func ListNotes(w http.ResponseWriter, r *http.Request) {
-	json.NewEncoder(w).Encode(notes)
+	result := []Note{}
+	collection.Find(nil).All(&result)
+	json.NewEncoder(w).Encode(result)
 }
 
 func ShowNote(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
+	noteId, _ := strconv.Atoi(vars["noteId"])
+	query := bson.M{"id": noteId}
 
-	noteId := vars["noteId"]
+	result := Note{}
+	err := collection.Find(query).One(&result)
 
-	found := false
-	for _, note := range notes {
-		if strconv.Itoa(note.Id) == noteId {
-			json.NewEncoder(w).Encode(note)
-			found = true
-		}
-	}
-
-	if !found {
+	if err == nil {
+		json.NewEncoder(w).Encode(result)
+	} else {
+		log.Println(err)
 		w.WriteHeader(404)
 	}
 }
