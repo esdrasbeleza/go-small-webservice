@@ -13,8 +13,6 @@ type Note struct {
 	Updated time.Time     `bson:"updated" json:"updated"`
 }
 
-var lastId int = 0
-
 func NewEmptyNote() Note {
 	return Note{Added: time.Now(), Updated: time.Now(), Id: bson.NewObjectId()}
 }
