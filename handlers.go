@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/gorilla/mux"
 	"gopkg.in/mgo.v2/bson"
@@ -23,8 +22,8 @@ func ListNotes(w http.ResponseWriter, r *http.Request) {
 
 func ShowNote(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	noteId, _ := strconv.Atoi(vars["noteId"])
-	query := bson.M{"id": noteId}
+	noteId := vars["noteId"]
+	query := bson.M{"_id": bson.ObjectIdHex(noteId)}
 
 	result := Note{}
 	err := collection.Find(query).One(&result)

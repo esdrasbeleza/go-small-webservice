@@ -34,14 +34,18 @@ func CreateSession() {
 
 func InsertNotesIntoDatabase() {
 	collection = session.DB("notes").C("notes")
+	collection.RemoveAll(nil)
 
 	notes := []Note{
 		CreateNote("Things to buy", "Eggs, ham, cheese, beer"),
 		CreateNote("Important URL", "http://www.esdrasbeleza.com"),
 	}
 
-	for index, note := range notes {
-		log.Printf("Inserting note %d\n", index)
-		collection.Insert(&note)
+	for _, note := range notes {
+		log.Printf("Inserting note %s\n", note.Id)
+		err := collection.Insert(note)
+		if err != nil {
+			log.Println(err)
+		}
 	}
 }
