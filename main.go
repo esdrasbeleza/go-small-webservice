@@ -5,12 +5,16 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"gopkg.in/mgo.v2"
 )
 
-var dao MongoNotesDAO
+var (
+	dao     MongoNotesDAO
+	session *mgo.Session
+)
 
 func main() {
-	defer dao.Close()
+	defer session.Close()
 
 	router := setupRouter()
 
@@ -19,7 +23,10 @@ func main() {
 }
 
 func setupRouter() *mux.Router {
-	dao = CreateNotesMongoDao()
+	session := createDatabaseSession()
+	collection := session.DB("notes").C("notes")
+
+	dao = CreateNotesMongoDao(collection)
 	dao.resetDatabase()
 	handler := CreateHandler(dao)
 
@@ -29,4 +36,14 @@ func setupRouter() *mux.Router {
 	router.HandleFunc("/note/id/{noteId}", handler.GetNote)
 	router.HandleFunc("/note/create", handler.RegisterNote).Methods("POST")
 	return router
+}
+
+func createDatabaseSession() *mgo.Session {
+	session, error := mgo.Dial("127.0.0.1")
+
+	if error != nil {
+		panic(error)
+	}
+
+	return session
 }

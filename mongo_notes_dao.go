@@ -8,24 +8,11 @@ import (
 )
 
 type MongoNotesDAO struct {
-	session    *mgo.Session
 	collection *mgo.Collection
 }
 
-func CreateNotesMongoDao() MongoNotesDAO {
-	session := createDatabaseSession()
-	collection := session.DB("notes").C("notes")
-	return MongoNotesDAO{session: session, collection: collection}
-}
-
-func createDatabaseSession() *mgo.Session {
-	session, error := mgo.Dial("127.0.0.1")
-
-	if error != nil {
-		panic(error)
-	}
-
-	return session
+func CreateNotesMongoDao(collection *mgo.Collection) MongoNotesDAO {
+	return MongoNotesDAO{collection: collection}
 }
 
 func (n MongoNotesDAO) GetAllNotes() []Note {
@@ -44,10 +31,6 @@ func (n MongoNotesDAO) GetNoteById(noteId string) (Note, error) {
 
 func (n MongoNotesDAO) StoreNote(note Note) error {
 	return n.collection.Insert(note)
-}
-
-func (n MongoNotesDAO) Close() {
-	n.session.Close()
 }
 
 func (n MongoNotesDAO) resetDatabase() {
