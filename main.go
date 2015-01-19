@@ -25,10 +25,13 @@ func main() {
 
 func setupRouter() *mux.Router {
 	// FIXME: routes are NOT in the right REST format
+	dao := CreateNotesMongoDao()
+	handler := CreateHandler(dao)
 	router := mux.NewRouter().StrictSlash(true)
-	router.HandleFunc("/note", ListNotes)
-	router.HandleFunc("/note/id/{noteId}", GetNote)
-	router.HandleFunc("/note/create", RegisterNote).Methods("POST")
+
+	router.HandleFunc("/note", handler.ListNotes)
+	router.HandleFunc("/note/id/{noteId}", handler.GetNote)
+	router.HandleFunc("/note/create", handler.RegisterNote).Methods("POST")
 	return router
 }
 

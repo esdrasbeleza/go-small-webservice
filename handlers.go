@@ -7,16 +7,22 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"gopkg.in/mgo.v2/bson"
 )
 
-func ListNotes(w http.ResponseWriter, r *http.Request) {
-	result := []Note{}
-	collection.Find(nil).All(&result)
+type Handler struct {
+	Dao NotesDao
+}
+
+func CreateHandler(dao NotesDao) Handler {
+	return Handler{Dao: dao}
+}
+
+func (handler *Handler) ListNotes(w http.ResponseWriter, r *http.Request) {
+	result := handler.Dao.GetAllNotes()
 	json.NewEncoder(w).Encode(result)
 }
 
-func RegisterNote(w http.ResponseWriter, r *http.Request) {
+func (handler *Handler) RegisterNote(w http.ResponseWriter, r *http.Request) {
 	note := NewEmptyNote()
 	jsonError := json.NewDecoder(r.Body).Decode(&note)
 
@@ -24,7 +30,7 @@ func RegisterNote(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 	} else {
 		log.Printf("Inserting new note %s \n", note)
-		insertError := collection.Insert(note)
+		insertError := handler.Dao.StoreNote(note)
 		if insertError != nil {
 			fmt.Fprintln(w, insertError)
 			w.WriteHeader(http.StatusInternalServerError)
@@ -34,13 +40,10 @@ func RegisterNote(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetNote(w http.ResponseWriter, r *http.Request) {
+func (handler *Handler) GetNote(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	noteId := vars["noteId"]
-	query := bson.M{"_id": bson.ObjectIdHex(noteId)}
-
-	result := Note{}
-	err := collection.Find(query).One(&result)
+	result, err := handler.Dao.GetNoteById(noteId)
 
 	if err != nil {
 		// TODO: handle errors different of 404
