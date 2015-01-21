@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	dao     MongoNotesDAO
+	dao     *MongoNotesDAO
 	session *mgo.Session
 )
 

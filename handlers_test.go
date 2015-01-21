@@ -10,16 +10,16 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var handler Handler
+var handler *Handler
 
 type FakeDao struct {
 	notes []Note
 }
 
-func (f *FakeDao) createNotes() {
+func (f FakeDao) createNotes() {
 	emptyNote := NewEmptyNote()
 	newNote := NewNote("My new note", "Some text")
-	f.notes = []Note{emptyNote, newNote}
+	f.notes = []Note{*emptyNote, *newNote}
 }
 
 func (f FakeDao) GetAllNotes() []Note {
@@ -39,7 +39,7 @@ func (f FakeDao) GetNoteById(noteId string) (Note, error) {
 	}
 }
 
-func (f FakeDao) StoreNote(note Note) error {
+func (f FakeDao) StoreNote(note *Note) error {
 	return nil
 }
 

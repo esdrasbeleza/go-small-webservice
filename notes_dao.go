@@ -5,5 +5,5 @@ type NotesDao interface {
 
 	GetNoteById(noteId string) (Note, error)
 
-	StoreNote(note Note) error
+	StoreNote(note *Note) error
 }

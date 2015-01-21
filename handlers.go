@@ -13,16 +13,16 @@ type Handler struct {
 	Dao NotesDao
 }
 
-func CreateHandler(dao NotesDao) Handler {
-	return Handler{Dao: dao}
+func CreateHandler(dao NotesDao) *Handler {
+	return &Handler{Dao: dao}
 }
 
-func (handler *Handler) ListNotes(w http.ResponseWriter, r *http.Request) {
+func (handler Handler) ListNotes(w http.ResponseWriter, r *http.Request) {
 	result := handler.Dao.GetAllNotes()
 	json.NewEncoder(w).Encode(result)
 }
 
-func (handler *Handler) RegisterNote(w http.ResponseWriter, r *http.Request) {
+func (handler Handler) RegisterNote(w http.ResponseWriter, r *http.Request) {
 	note := NewEmptyNote()
 	jsonError := json.NewDecoder(r.Body).Decode(&note)
 
@@ -40,7 +40,7 @@ func (handler *Handler) RegisterNote(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (handler *Handler) GetNote(w http.ResponseWriter, r *http.Request) {
+func (handler Handler) GetNote(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	noteId := vars["noteId"]
 	result, err := handler.Dao.GetNoteById(noteId)

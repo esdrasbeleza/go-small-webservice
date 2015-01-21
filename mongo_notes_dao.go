@@ -11,8 +11,8 @@ type MongoNotesDAO struct {
 	collection *mgo.Collection
 }
 
-func CreateNotesMongoDao(collection *mgo.Collection) MongoNotesDAO {
-	return MongoNotesDAO{collection: collection}
+func CreateNotesMongoDao(collection *mgo.Collection) *MongoNotesDAO {
+	return &MongoNotesDAO{collection: collection}
 }
 
 func (n MongoNotesDAO) GetAllNotes() []Note {
@@ -29,14 +29,14 @@ func (n MongoNotesDAO) GetNoteById(noteId string) (Note, error) {
 	return result, err
 }
 
-func (n MongoNotesDAO) StoreNote(note Note) error {
+func (n MongoNotesDAO) StoreNote(note *Note) error {
 	return n.collection.Insert(note)
 }
 
 func (n MongoNotesDAO) resetDatabase() {
 	n.collection.RemoveAll(nil)
 
-	notes := []Note{
+	notes := []*Note{
 		NewNote("Things to buy", "Eggs, ham, cheese, beer"),
 		NewNote("Important URL", "http://www.esdrasbeleza.com"),
 	}

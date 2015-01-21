@@ -13,10 +13,10 @@ type Note struct {
 	Updated time.Time     `bson:"updated" json:"updated"`
 }
 
-func NewEmptyNote() Note {
-	return Note{Added: time.Now(), Updated: time.Now(), Id: bson.NewObjectId()}
+func NewEmptyNote() *Note {
+	return &Note{Added: time.Now(), Updated: time.Now(), Id: bson.NewObjectId()}
 }
 
-func NewNote(title, text string) Note {
-	return Note{Title: title, Text: text, Added: time.Now(), Updated: time.Now(), Id: bson.NewObjectId()}
+func NewNote(title, text string) *Note {
+	return &Note{Title: title, Text: text, Added: time.Now(), Updated: time.Now(), Id: bson.NewObjectId()}
 }
