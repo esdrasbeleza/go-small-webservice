@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -32,7 +31,6 @@ func (handler Handler) RegisterNote(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Inserting new note %s \n", note)
 		insertError := handler.Dao.StoreNote(note)
 		if insertError != nil {
-			fmt.Fprintln(w, insertError)
 			w.WriteHeader(http.StatusInternalServerError)
 		} else {
 			w.WriteHeader(http.StatusCreated)
@@ -46,7 +44,7 @@ func (handler Handler) GetNote(w http.ResponseWriter, r *http.Request) {
 	result, err := handler.Dao.GetNoteById(noteId)
 
 	if err != nil {
-		// TODO: handle errors different of 404
+		// FIXME: every error is being handled as if the object was not found
 		log.Println(err)
 		w.WriteHeader(http.StatusNotFound)
 	} else {
