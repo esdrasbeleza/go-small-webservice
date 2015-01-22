@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"log"
 
 	"gopkg.in/mgo.v2"
@@ -22,10 +23,15 @@ func (n MongoNotesDAO) GetAllNotes() []Note {
 }
 
 func (n MongoNotesDAO) GetNoteById(noteId string) (Note, error) {
-	query := bson.M{"_id": bson.ObjectIdHex(noteId)}
 	result := Note{}
-	err := n.collection.Find(query).One(&result)
+	var err error
 
+	if bson.IsObjectIdHex(noteId) {
+		bsonId := bson.ObjectIdHex(noteId)
+		err = n.collection.FindId(bsonId).One(&result)
+	} else {
+		err = errors.New("not found")
+	}
 	return result, err
 }
 
