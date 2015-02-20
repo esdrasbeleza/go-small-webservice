@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
 	"gopkg.in/mgo.v2"
@@ -39,7 +40,8 @@ func setupRouter() *mux.Router {
 }
 
 func createDatabaseSession() *mgo.Session {
-	session, error := mgo.Dial("127.0.0.1")
+	server := os.Getenv("DB_PORT_27017_TCP_ADDR")
+	session, error := mgo.Dial(server)
 
 	if error != nil {
 		panic(error)
